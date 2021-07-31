@@ -23,6 +23,7 @@ namespace Hotswap
              BaseROM = new ROM(BaseROMConfig.GetROMPath(ProjectConfig.Project.BaseROMCode));
              PatchROMSettings();
              PatchROMFileSystem();
+             PatchExecutableFileSystem();
              BaseROM.Serialize($"{ProjectConfig.Project.ProjectName}.nds");
         }
 
@@ -59,6 +60,36 @@ namespace Hotswap
             if (Directory.Exists(ProjectConfig.Project.ROMFileSystemPath))
                 foreach (string File in Directory.EnumerateFiles(ProjectConfig.Project.ROMFileSystemPath, "*", SearchOption.AllDirectories))
                     PatchFile(File, Path.GetRelativePath(ProjectConfig.Project.ROMFileSystemPath, File));
+        }
+
+        private void PatchExecutableFileSystem()
+        {
+            if (Directory.Exists(ProjectConfig.Project.ExecutableFileSystemPath))
+            {
+                if (File.Exists(Path.Combine(ProjectConfig.Project.ExecutableFileSystemPath, "ARM9.bin")))
+                    BaseROM.ARM9Binary.Data =
+                        File.ReadAllBytes(Path.Combine(ProjectConfig.Project.ExecutableFileSystemPath, "ARM9.bin"));
+                
+                if (File.Exists(Path.Combine(ProjectConfig.Project.ExecutableFileSystemPath, "ARM7.bin")))
+                    BaseROM.ARM7Binary.Data =
+                        File.ReadAllBytes(Path.Combine(ProjectConfig.Project.ExecutableFileSystemPath, "ARM7.bin"));
+                
+                if (File.Exists(Path.Combine(ProjectConfig.Project.ExecutableFileSystemPath, "ARM9i.bin")))
+                    BaseROM.ARM9iBinary.Data =
+                        File.ReadAllBytes(Path.Combine(ProjectConfig.Project.ExecutableFileSystemPath, "ARM9i.bin"));
+                
+                if (File.Exists(Path.Combine(ProjectConfig.Project.ExecutableFileSystemPath, "ARM7i.bin")))
+                    BaseROM.ARM7iBinary.Data =
+                        File.ReadAllBytes(Path.Combine(ProjectConfig.Project.ExecutableFileSystemPath, "ARM7i.bin"));
+                
+                if (File.Exists(Path.Combine(ProjectConfig.Project.ExecutableFileSystemPath, "ARM9OverlayTable.bin")))
+                    BaseROM.ARM9OverlayTable.Data =
+                        File.ReadAllBytes(Path.Combine(ProjectConfig.Project.ExecutableFileSystemPath, "ARM9OverlayTable.bin"));
+                
+                if (File.Exists(Path.Combine(ProjectConfig.Project.ExecutableFileSystemPath, "ARM7OverlayTable.bin")))
+                    BaseROM.ARM7OverlayTable.Data =
+                        File.ReadAllBytes(Path.Combine(ProjectConfig.Project.ExecutableFileSystemPath, "ARM7OverlayTable.bin"));
+            }
         }
 
         public NitroFile GetFileFromOriginROM(string FilePath) => NitroDirectory.SearchDirectoryForFile(BaseROM.Root, FilePath, "/");
