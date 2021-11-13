@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using YamlDotNet.Core.Tokens;
 using YamlDotNet.RepresentationModel;
 using YamlDotNet.Serialization;
 
@@ -10,23 +8,27 @@ namespace Hotswap.Configuration
 {
     public class BaseROMConfiguration
     {
-        public List<GameDefinition> BaseROMLookupTable { get; }
         public BaseROMConfiguration(string Path)
         {
+            Games = new List<string>();
             BaseROMLookupTable = new List<GameDefinition>();
-            foreach (KeyValuePair<string, List<YamlMappingNode>> BaseROMPair in new Deserializer()
+            foreach (var BaseROMPair in new Deserializer()
                 .Deserialize<Dictionary<string, List<YamlMappingNode>>>(File.ReadAllText(Path)))
             {
-                Dictionary<string, string> ParsedConfig = Util.ParseConfigurationYAML(BaseROMPair.Value, 2);
+                Games.Add(BaseROMPair.Key);
+                var ParsedConfig = Util.ParseConfigurationYAML(BaseROMPair.Value, 2);
                 if (!ParsedConfig.ContainsKey("Path") || !ParsedConfig.ContainsKey("ROMCode"))
                     throw new Exception("Lmao got em");
                 BaseROMLookupTable.Add(new GameDefinition
                 {
                     Path = ParsedConfig["Path"],
-                    ROMCode = ParsedConfig["ROMCode"],
+                    ROMCode = ParsedConfig["ROMCode"]
                 });
             }
         }
+
+        public List<string> Games { get; }
+        public List<GameDefinition> BaseROMLookupTable { get; }
 
         public string GetROMPath(string ROMCode)
         {
@@ -39,7 +41,8 @@ namespace Hotswap.Configuration
             }
             catch (Exception)
             {
-                throw new Exception($"Could not find the ROM Code \"{ROMCode}\" in the database. Make sure it is there, and try again.");
+                throw new Exception(
+                    $"Could not find the ROM Code \"{ROMCode}\" in the database. Make sure it is there, and try again.");
             }
         }
     }

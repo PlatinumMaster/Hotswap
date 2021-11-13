@@ -5,6 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="OpenTK.NetStandard" Version="1.0.5.32" />
       <PackageReference Include="YamlDotNet" Version="8.1.2" />
     </ItemGroup>
 
