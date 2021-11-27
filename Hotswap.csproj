@@ -10,7 +10,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\NitroSharp\NitroSharp.csproj" />
+      <ProjectReference Include="..\NitroSharp\NitroSharp.csproj" />
     </ItemGroup>
 
 </Project>
