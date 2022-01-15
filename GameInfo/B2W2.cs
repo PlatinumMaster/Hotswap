@@ -22,6 +22,8 @@
 
         public override string[] systemsText => new[] {"0", "0", "2"};
         public override string[] mapText => new[] {"0", "0", "3"};
+        public override string[] maps => new[] {"0", "0", "8"};
+        public override string[] matrix => new[] {"0", "0", "9"};
         public override string[] zoneHeaders => new[] {"0", "1", "2"};
         public override string[] scripts => new[] {"0", "5", "6"};
         public override string[] trainerData => new[] {"0", "9", "1"};
@@ -29,7 +31,6 @@
         public override string[] zoneEntities => new[] {"1", "2", "6"};
         public override string[] wildEncounters => new[] {"1", "2", "7"};
 
-        public override string[] maps => new[] {"0", "0", "8"};
 
         public override int[] scriptPlugins => new[] {
             50, 51, 52, 53, 54, 55, 58, 61, 62, 63, 64, 65, 66, 67, 68

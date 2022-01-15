@@ -13,6 +13,7 @@ namespace BeaterLibrary.GameInfo {
         public abstract int[] scriptPlugins { get; }
         public abstract string title { get; }
         public abstract string[] maps { get; }
+        public abstract string[] matrix { get; }
 
         public abstract int getScriptPluginsByScrId(int scriptIndex);
 
