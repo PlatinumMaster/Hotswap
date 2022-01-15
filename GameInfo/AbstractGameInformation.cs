@@ -1,19 +1,27 @@
 ﻿using System.IO;
 
-namespace BeaterLibrary.GameInfo
-{
-    public abstract class AbstractGameInformation
-    {
-        public abstract string[] SystemsText { get; }
-        public abstract string[] MapText { get; }
-        public abstract string[] ZoneHeader { get; }
-        public abstract string[] TrainerData { get; }
-        public abstract string[] TrainerPokemon { get; }
-        public abstract string[] ZoneEntities { get; }
-        public abstract string[] Scripts { get; }
-        public abstract int[] GetScriptPluginsByScrID(int ScriptIndex);
-        public abstract string Title { get; }
-        public static string GetSystemPath(string[] Data) => Path.Combine(Data);
-        public static string GetGamePath(string[] Data) => "/a/" + string.Join("/", Data);
+namespace BeaterLibrary.GameInfo {
+    public abstract class AbstractGameInformation {
+        public abstract string[] systemsText { get; }
+        public abstract string[] mapText { get; }
+        public abstract string[] zoneHeaders { get; }
+        public abstract string[] trainerData { get; }
+        public abstract string[] trainerPokemon { get; }
+        public abstract string[] zoneEntities { get; }
+        public abstract string[] scripts { get; }
+        public abstract string[] wildEncounters { get; }
+        public abstract int[] scriptPlugins { get; }
+        public abstract string title { get; }
+        public abstract string[] maps { get; }
+
+        public abstract int getScriptPluginsByScrId(int scriptIndex);
+
+        public static string getSystemPath(string[] data) {
+            return Path.Combine(data);
+        }
+
+        public static string getGamePath(string[] data) {
+            return "/a/" + string.Join("/", data);
+        }
     }
 }

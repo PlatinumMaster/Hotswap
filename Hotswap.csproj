@@ -5,12 +5,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="OpenTK.NetStandard" Version="1.0.5.32" />
-      <PackageReference Include="YamlDotNet" Version="8.1.2" />
+        <PackageReference Include="Avalonia.AvaloniaEdit" Version="0.10.4" />
+        <PackageReference Include="OpenTK.NetStandard" Version="1.0.5.32" />
+        <PackageReference Include="YamlDotNet" Version="11.2.1" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\NitroSharp\NitroSharp.csproj" />
+        <ProjectReference Include="..\NitroSharp\NitroSharp.csproj" />
     </ItemGroup>
 
 </Project>

@@ -7,228 +7,204 @@ using NitroSharp.Formats;
 using NitroSharp.Formats.ROM;
 using NitroSharp.IO;
 
-namespace Hotswap
-{
-    public class Patcher
-    {
-        public Patcher(string BaseROMConfigPath, string ProjectConfigPath)
-        {
-            BaseROMConfig = new BaseROMConfiguration(BaseROMConfigPath);
-            ProjectConfig = new ProjectConfiguration(ProjectConfigPath);
-            BaseROM = new ROM(BaseROMConfig.GetROMPath(ProjectConfig.Project.BaseROMCode));
+namespace Hotswap {
+    public class Patcher {
+        public Patcher(string baseRomConfigPath, string projectConfigPath) {
+            baseRomConfig = new baseROMConfiguration();
+            baseRomConfig.initializePatcher(baseRomConfigPath);
+            projectConfig = new ProjectConfiguration(projectConfigPath);
+            baseRom = new Rom(baseRomConfig.getRomPath(projectConfig.project.baseRomCode));
         }
 
-        private BaseROMConfiguration BaseROMConfig { get; }
-        private ProjectConfiguration ProjectConfig { get; }
-        private ROM BaseROM { get; }
-
-        private void PatchROMSettings()
-        {
-            BaseROM.Header.Title = ProjectConfig.Project.ProjectGameTitle;
-            BaseROM.Header.GameCode = ProjectConfig.Project.ProjectROMCode;
+        private baseROMConfiguration baseRomConfig { get; }
+        private ProjectConfiguration projectConfig { get; }
+        private Rom baseRom { get; }
+        
+        private void patchRomSettings() {
+            baseRom.header.title = projectConfig.project.projectGameTitle;
+            baseRom.header.gameCode = projectConfig.project.projectRomCode;
         }
 
-        private void PatchROMFileSystem()
-        {
-            if (Directory.Exists(ProjectConfig.Project.NARCsPath))
-            {
-                var NARCs = new List<string>();
-                RecursiveDepthSearch(ProjectConfig.Project.NARCsPath, 0, 3, ref NARCs);
-                foreach (var NARC in NARCs)
-                {
-                    var OriginalFile =
-                        GetFileFromOriginROM(
-                            AbstractGameInformation.GetGamePath(Path.GetRelativePath(ProjectConfig.Project.NARCsPath,NARC).Split(Path.DirectorySeparatorChar)));
-                    var NARCFile = new NARC(OriginalFile.FileData);
-                    foreach (var SrcFile in Directory.GetFiles(NARC))
-                    {
-                        var Index = int.Parse(Path.GetFileNameWithoutExtension(SrcFile));
-                        if (Index >= NARCFile.FAT.Entries.Count)
-                            NARCFile.FAT.Entries.Add(new FATB_Entry(File.ReadAllBytes(SrcFile)));
-                        else if (Index < 0)
+        private void patchRomFileSystem() {
+            if (Directory.Exists(projectConfig.project.narCsPath)) {
+                var narCs = new List<string>();
+                recursiveDepthSearch(projectConfig.project.narCsPath, 0, 3, ref narCs);
+                foreach (var narc in narCs) {
+                    var originalFile =
+                        getFileFromOriginRom(
+                            AbstractGameInformation.getGamePath(Path
+                                .GetRelativePath(projectConfig.project.narCsPath, narc)
+                                .Split(Path.DirectorySeparatorChar)));
+                    var narcFile = new Narc(originalFile.fileData);
+                    foreach (var srcFile in Directory.GetFiles(narc)) {
+                        var index = int.Parse(Path.GetFileNameWithoutExtension(srcFile));
+                        if (index >= narcFile.fat.entries.Count)
+                            narcFile.fat.entries.Add(new FatbEntry(File.ReadAllBytes(srcFile)));
+                        else if (index < 0)
                             throw new Exception("Invalid file index.");
                         else
-                            NARCFile.FAT.Entries[Index].Buffer = File.ReadAllBytes(SrcFile);
+                            narcFile.fat.entries[index].buffer = File.ReadAllBytes(srcFile);
                     }
 
-                    OriginalFile.FileData = NARCFile.Serialize();
+                    originalFile.fileData = narcFile.serialize();
                 }
             }
 
-            if (Directory.Exists(ProjectConfig.Project.ROMFileSystemPath))
-                foreach (var File in Directory.EnumerateFiles(ProjectConfig.Project.ROMFileSystemPath, "*",
-                    SearchOption.AllDirectories))
-                    PatchFile(File, Path.GetRelativePath(ProjectConfig.Project.ROMFileSystemPath, File));
+            if (Directory.Exists(projectConfig.project.romFileSystemPath))
+                foreach (var file in Directory.EnumerateFiles(projectConfig.project.romFileSystemPath, "*",
+                             SearchOption.AllDirectories))
+                    patchFile(file, Path.GetRelativePath(projectConfig.project.romFileSystemPath, file));
         }
 
-        private void PatchExecutableFileSystem()
-        {
-            if (Directory.Exists(ProjectConfig.Project.ExecutableFileSystemPath))
-            {
-                if (File.Exists(Path.Combine(ProjectConfig.Project.ExecutableFileSystemPath, "ARM9.bin")))
-                    BaseROM.ARM9Binary.Data =
-                        File.ReadAllBytes(Path.Combine(ProjectConfig.Project.ExecutableFileSystemPath, "ARM9.bin"));
+        private void patchExecutableFileSystem() {
+            if (Directory.Exists(projectConfig.project.executableFileSystemPath)) {
+                if (File.Exists(Path.Combine(projectConfig.project.executableFileSystemPath, "ARM9.bin")))
+                    baseRom.arm9Binary.data =
+                        File.ReadAllBytes(Path.Combine(projectConfig.project.executableFileSystemPath, "ARM9.bin"));
 
-                if (File.Exists(Path.Combine(ProjectConfig.Project.ExecutableFileSystemPath, "ARM7.bin")))
-                    BaseROM.ARM7Binary.Data =
-                        File.ReadAllBytes(Path.Combine(ProjectConfig.Project.ExecutableFileSystemPath, "ARM7.bin"));
+                if (File.Exists(Path.Combine(projectConfig.project.executableFileSystemPath, "ARM7.bin")))
+                    baseRom.arm7Binary.data =
+                        File.ReadAllBytes(Path.Combine(projectConfig.project.executableFileSystemPath, "ARM7.bin"));
 
-                if (File.Exists(Path.Combine(ProjectConfig.Project.ExecutableFileSystemPath, "ARM9i.bin")))
-                    BaseROM.ARM9iBinary.Data =
-                        File.ReadAllBytes(Path.Combine(ProjectConfig.Project.ExecutableFileSystemPath, "ARM9i.bin"));
+                if (File.Exists(Path.Combine(projectConfig.project.executableFileSystemPath, "ARM9i.bin")))
+                    baseRom.arm9IBinary.data =
+                        File.ReadAllBytes(Path.Combine(projectConfig.project.executableFileSystemPath, "ARM9i.bin"));
 
-                if (File.Exists(Path.Combine(ProjectConfig.Project.ExecutableFileSystemPath, "ARM7i.bin")))
-                    BaseROM.ARM7iBinary.Data =
-                        File.ReadAllBytes(Path.Combine(ProjectConfig.Project.ExecutableFileSystemPath, "ARM7i.bin"));
+                if (File.Exists(Path.Combine(projectConfig.project.executableFileSystemPath, "ARM7i.bin")))
+                    baseRom.arm7IBinary.data =
+                        File.ReadAllBytes(Path.Combine(projectConfig.project.executableFileSystemPath, "ARM7i.bin"));
 
-                if (File.Exists(Path.Combine(ProjectConfig.Project.ExecutableFileSystemPath, "ARM9OverlayTable.bin")))
-                    BaseROM.ARM9OverlayTable.Data =
-                        File.ReadAllBytes(Path.Combine(ProjectConfig.Project.ExecutableFileSystemPath,
+                if (File.Exists(Path.Combine(projectConfig.project.executableFileSystemPath, "ARM9OverlayTable.bin")))
+                    baseRom.arm9OverlayTable.data =
+                        File.ReadAllBytes(Path.Combine(projectConfig.project.executableFileSystemPath,
                             "ARM9OverlayTable.bin"));
 
-                if (File.Exists(Path.Combine(ProjectConfig.Project.ExecutableFileSystemPath, "ARM7OverlayTable.bin")))
-                    BaseROM.ARM7OverlayTable.Data =
-                        File.ReadAllBytes(Path.Combine(ProjectConfig.Project.ExecutableFileSystemPath,
+                if (File.Exists(Path.Combine(projectConfig.project.executableFileSystemPath, "ARM7OverlayTable.bin")))
+                    baseRom.arm7OverlayTable.data =
+                        File.ReadAllBytes(Path.Combine(projectConfig.project.executableFileSystemPath,
                             "ARM7OverlayTable.bin"));
 
-                PatchOverlays();
+                patchOverlays();
             }
         }
 
-        public NitroFile GetFileFromOriginROM(string FilePath)
-        {
-            return NitroDirectory.SearchDirectoryForFile(BaseROM.Root, FilePath);
+        public NitroFile getFileFromOriginRom(string filePath) {
+            return NitroDirectory.searchDirectoryForFile(baseRom.root, filePath);
         }
 
-        public void PatchFile(string Path, string ROMPath)
-        {
-            var Foo = GetFileFromOriginROM($"/{ROMPath}");
-            if (Foo != null)
-                Foo.FileData = File.ReadAllBytes(Path);
+        public void patchFile(string path, string romPath) {
+            var foo = getFileFromOriginRom($"/{romPath}");
+            if (foo != null)
+                foo.fileData = File.ReadAllBytes(path);
         }
 
-        private void RecursiveDepthSearch(string Parent, int ActualDepth, int TargetDepth, ref List<string> Paths)
-        {
-            if (ActualDepth == TargetDepth)
-            {
-                Paths.Add(Parent);
+        private void recursiveDepthSearch(string parent, int actualDepth, int targetDepth, ref List<string> paths) {
+            if (actualDepth == targetDepth) {
+                paths.Add(parent);
                 return;
             }
 
-            if (ActualDepth > TargetDepth)
+            if (actualDepth > targetDepth)
                 return;
 
-            foreach (var Directory in Directory.GetDirectories(Parent))
-                RecursiveDepthSearch(Directory, ActualDepth + 1, TargetDepth, ref Paths);
+            foreach (var directory in Directory.GetDirectories(parent))
+                recursiveDepthSearch(directory, actualDepth + 1, targetDepth, ref paths);
         }
 
-        public byte[] FetchFileFromNARC(string[] GamePath, int ID)
-        {
-            var ExternalPath = Path.Combine(ProjectConfig.Project.NARCsPath, AbstractGameInformation.GetSystemPath(GamePath), $"{ID}.bin");
-            if (File.Exists(ExternalPath))
-                return File.ReadAllBytes(ExternalPath);
-            return new NARC(GetFileFromOriginROM(AbstractGameInformation.GetGamePath(GamePath)).FileData).FAT.Entries[ID].Buffer;
+        public byte[] fetchFileFromNarc(string[] gamePath, int id) {
+            var externalPath = Path.Combine(projectConfig.project.narCsPath,
+                AbstractGameInformation.getSystemPath(gamePath), $"{id}.bin");
+            if (File.Exists(externalPath))
+                return File.ReadAllBytes(externalPath);
+            return new Narc(getFileFromOriginRom(AbstractGameInformation.getGamePath(gamePath)).fileData).fat
+                .entries[id].buffer;
         }
 
-        public NitroFile FetchFileFromROMFS(string[] GamePath)
-        {
-            var OriginFile = GetFileFromOriginROM(AbstractGameInformation.GetGamePath(GamePath));
-            var ExternalPath = Path.Combine(ProjectConfig.Project.ROMFileSystemPath, AbstractGameInformation.GetSystemPath(GamePath));
-            if (File.Exists(ExternalPath))
-                OriginFile.FileData = File.ReadAllBytes(ExternalPath);
-            return OriginFile;
+        public NitroFile fetchFileFromRomfs(string[] gamePath) {
+            var originFile = getFileFromOriginRom(AbstractGameInformation.getGamePath(gamePath));
+            var externalPath = Path.Combine(projectConfig.project.romFileSystemPath,
+                AbstractGameInformation.getSystemPath(gamePath));
+            if (File.Exists(externalPath))
+                originFile.fileData = File.ReadAllBytes(externalPath);
+            return originFile;
         }
 
-        public string GetFilePathToDisk(string File)
-        {
-            return Path.Combine(ProjectConfig.Project.ROMFileSystemPath, File);
+        public string getFilePathToDisk(string file) {
+            return Path.Combine(projectConfig.project.romFileSystemPath, file);
         }
 
-        public string GetNARCFolderPathToDisk(string File)
-        {
-            return Path.Combine(ProjectConfig.Project.NARCsPath, File);
+        public string getNarcFolderPathToDisk(string file) {
+            return Path.Combine(projectConfig.project.narCsPath, file);
         }
 
-        public void SaveToNARCFolder(string[] NARC, int Index, Action<string> Methodology)
-        {
-            string NARCPath = AbstractGameInformation.GetSystemPath(NARC);
-            Directory.CreateDirectory(GetNARCFolderPathToDisk(NARCPath));
-            Methodology(Path.Combine(GetNARCFolderPathToDisk(NARCPath), $"{Index}.bin"));
+        public void saveToNarcFolder(string[] narc, int index, Action<string> methodology) {
+            var narcPath = AbstractGameInformation.getSystemPath(narc);
+            Directory.CreateDirectory(getNarcFolderPathToDisk(narcPath));
+            methodology(Path.Combine(getNarcFolderPathToDisk(narcPath), $"{index}.bin"));
         }
 
-        public void PatchOverlays()
-        {
-            var ChangedIndices = new List<int>();
-            if (Directory.Exists(ProjectConfig.Project.OverlayModulePath))
-            {
-                foreach (var Overlay in Directory.GetFiles(ProjectConfig.Project.OverlayModulePath))
-                {
-                    var Index = int.Parse(Path.GetFileNameWithoutExtension(Overlay));
-                    if (Index < 0)
+        public void patchOverlays() {
+            var changedIndices = new List<int>();
+            if (Directory.Exists(projectConfig.project.overlayModulePath)) {
+                foreach (var overlay in Directory.GetFiles(projectConfig.project.overlayModulePath)) {
+                    var index = int.Parse(Path.GetFileNameWithoutExtension(overlay));
+                    if (index < 0)
                         continue;
-                    if (Index < BaseROM.ARM9Overlays.Count && Index >= 0)
-                        BaseROM.ARM9Overlays[Index].Data = File.ReadAllBytes(Overlay);
-                    else if (Index >= BaseROM.ARM9Overlays.Count)
-                        BaseROM.ARM9Overlays.Add(new NitroOverlay
-                        {
-                            Data = File.ReadAllBytes(Overlay)
+                    if (index < baseRom.arm9Overlays.Count && index >= 0)
+                        baseRom.arm9Overlays[index].data = File.ReadAllBytes(overlay);
+                    else if (index >= baseRom.arm9Overlays.Count)
+                        baseRom.arm9Overlays.Add(new NitroOverlay {
+                            data = File.ReadAllBytes(overlay)
                         });
-                    ChangedIndices.Add(Index);
+                    changedIndices.Add(index);
                 }
 
-                BaseROM.ARM9OverlayTable.Data = UpdateARM9OverlayTable(ChangedIndices);
+                baseRom.arm9OverlayTable.data = updateArm9OverlayTable(changedIndices);
             }
         }
 
-        public byte[] UpdateARM9OverlayTable(List<int> ChangedIndices)
-        {
-            var Table = BaseROM.ARM9OverlayTable;
-            foreach (var Overlay in BaseROM.ARM9Overlays)
-            {
-                var Index = BaseROM.ARM9Overlays.IndexOf(Overlay);
-                if (ChangedIndices.Contains(Index))
-                    if (Index > Table.OverlayTableEntries.Count)
-                    {
-                        Table.OverlayTableEntries.Add(new NitroOverlayTableEntry
-                        {
+        public byte[] updateArm9OverlayTable(List<int> changedIndices) {
+            var table = baseRom.arm9OverlayTable;
+            foreach (var overlay in baseRom.arm9Overlays) {
+                var index = baseRom.arm9Overlays.IndexOf(overlay);
+                if (changedIndices.Contains(index))
+                    if (index > table.overlayTableEntries.Count) {
+                        table.overlayTableEntries.Add(new NitroOverlayTableEntry {
                             // Set this up, so expansion works out later.
-                            ID = (uint) Index,
-                            RAMAddress = 0x23F900,
-                            RAMSize = Overlay.GetUncompressedSize(),
-                            BSSSize = 0, // Figure out how to get BSS Size, shouldn't be terrible?
-                            StaticInitStart = 0, //  This too...
-                            StaticInitEnd = 0, // This three...
-                            FileID = (uint) Index,
-                            CompressedSizeAndFlag = Overlay.CompressionFlag | Overlay.GetCompressedSize()
+                            id = (uint) index,
+                            ramAddress = 0x23F900,
+                            ramSize = overlay.getUncompressedSize(),
+                            bssSize = 0, // Figure out how to get BSS Size, shouldn't be terrible?
+                            staticInitStart = 0, //  This too...
+                            staticInitEnd = 0, // This three...
+                            fileId = (uint) index,
+                            compressedSizeAndFlag = overlay.compressionFlag | overlay.getCompressedSize()
                         });
                     }
-                    else
-                    {
-                        var Entry = Table.OverlayTableEntries[Index];
-                        Entry.RAMSize = Overlay.GetUncompressedSize();
-                        Entry.CompressedSizeAndFlag = Overlay.CompressionFlag | Overlay.GetCompressedSize();
+                    else {
+                        var entry = table.overlayTableEntries[index];
+                        entry.ramSize = overlay.getUncompressedSize();
+                        entry.compressedSizeAndFlag = overlay.compressionFlag | overlay.getCompressedSize();
                     }
             }
 
-            return Table.Serialize();
+            return table.serialize();
         }
 
-        public void PatchAndSerialize(string OutputPath)
-        {
-            PatchROMSettings();
-            PatchROMFileSystem();
-            PatchExecutableFileSystem();
-            BaseROM.Serialize(OutputPath);
+        public void patchAndSerialize(string outputPath) {
+            patchRomSettings();
+            patchRomFileSystem();
+            patchExecutableFileSystem();
+            baseRom.serialize(outputPath);
         }
 
-        public int GetNARCEntryCount(string[] GamePath)
-        {
-            return new NARC(GetFileFromOriginROM(AbstractGameInformation.GetGamePath(GamePath)).FileData).FAT.Entries.Count;
+        public int getNarcEntryCount(string[] gamePath) {
+            return new Narc(getFileFromOriginRom(AbstractGameInformation.getGamePath(gamePath)).fileData).fat.entries
+                .Count;
         }
 
-        public string GetGameCode()
-        {
-            return BaseROM.Header.GameCode;
+        public string getGameCode() {
+            return baseRom.header.gameCode;
         }
     }
 }

@@ -1,17 +1,15 @@
-﻿namespace Hotswap.Configuration
-{
-    public class ProjectDefinition
-    {
+﻿namespace Hotswap.Configuration {
+    public class ProjectDefinition {
         // Attributes that are customizable by the user.
-        public string ProjectName { get; set; }
-        public string ProjectROMCode { get; set; }
-        public string ProjectGameTitle { get; set; }
+        public string projectName { get; set; }
+        public string projectRomCode { get; set; }
+        public string projectGameTitle { get; set; }
 
         // General attributes for Hotswap.
-        public string ROMFileSystemPath { get; set; }
-        public string ExecutableFileSystemPath { get; set; }
-        public string NARCsPath { get; set; }
-        public string OverlayModulePath { get; set; }
-        public string BaseROMCode { get; set; }
+        public string romFileSystemPath { get; set; }
+        public string executableFileSystemPath { get; set; }
+        public string narCsPath { get; set; }
+        public string overlayModulePath { get; set; }
+        public string baseRomCode { get; set; }
     }
 }

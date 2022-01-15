@@ -3,33 +3,28 @@ using System.IO;
 using YamlDotNet.RepresentationModel;
 using YamlDotNet.Serialization;
 
-namespace Hotswap.Configuration
-{
-    public class ProjectConfiguration
-    {
-        public ProjectConfiguration(string ConfigPath)
-        {
-            foreach (var ProjectPropertiesPair in new Deserializer()
-                .Deserialize<Dictionary<string, List<YamlMappingNode>>>(File.ReadAllText(ConfigPath)))
-            {
-                var ParsedConfig = Util.ParseConfigurationYAML(ProjectPropertiesPair.Value, 7);
-                Project = new ProjectDefinition
-                {
-                    ProjectName = ProjectPropertiesPair.Key,
-                    BaseROMCode = ParsedConfig["BaseROMCode"],
-                    ExecutableFileSystemPath = Path.Combine(Directory.GetParent(ConfigPath).FullName,
-                        ParsedConfig["ExecutableFileSystemPath"]),
-                    ROMFileSystemPath = Path.Combine(Directory.GetParent(ConfigPath).FullName,
-                        ParsedConfig["ROMFileSystemPath"]),
-                    ProjectROMCode = ParsedConfig["ProjectROMCode"],
-                    ProjectGameTitle = ParsedConfig["ProjectGameTitle"],
-                    OverlayModulePath = Path.Combine(Directory.GetParent(ConfigPath).FullName,
-                        ParsedConfig["OverlayModulePath"]),
-                    NARCsPath = Path.Combine(Directory.GetParent(ConfigPath).FullName, ParsedConfig["NARCsPath"])
+namespace Hotswap.Configuration {
+    public class ProjectConfiguration {
+        public ProjectConfiguration(string configPath) {
+            foreach (var projectPropertiesPair in new Deserializer()
+                         .Deserialize<Dictionary<string, List<YamlMappingNode>>>(File.ReadAllText(configPath))) {
+                var parsedConfig = Util.parseConfigurationYaml(projectPropertiesPair.Value, 7);
+                project = new ProjectDefinition {
+                    projectName = projectPropertiesPair.Key,
+                    baseRomCode = parsedConfig["BaseROMCode"],
+                    executableFileSystemPath = Path.Combine(Directory.GetParent(configPath).FullName,
+                        parsedConfig["ExecutableFileSystemPath"]),
+                    romFileSystemPath = Path.Combine(Directory.GetParent(configPath).FullName,
+                        parsedConfig["ROMFileSystemPath"]),
+                    projectRomCode = parsedConfig["ProjectROMCode"],
+                    projectGameTitle = parsedConfig["ProjectGameTitle"],
+                    overlayModulePath = Path.Combine(Directory.GetParent(configPath).FullName,
+                        parsedConfig["OverlayModulePath"]),
+                    narCsPath = Path.Combine(Directory.GetParent(configPath).FullName, parsedConfig["NARCsPath"])
                 };
             }
         }
 
-        public ProjectDefinition Project { get; }
+        public ProjectDefinition project { get; }
     }
 }

@@ -3,38 +3,31 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using YamlDotNet.RepresentationModel;
 
-namespace Hotswap.Configuration
-{
-    public class Util
-    {
-        public static Dictionary<string, string> ParseConfigurationYAML(List<YamlMappingNode> PropsAsNodes,
-            int ExpectedCount)
-        {
-            var Properties = new Dictionary<string, string>();
-            if (PropsAsNodes != null)
-            {
-                if (PropsAsNodes.Count != ExpectedCount)
+namespace Hotswap.Configuration {
+    public class Util {
+        public static Dictionary<string, string> parseConfigurationYaml(List<YamlMappingNode> propsAsNodes,
+            int expectedCount) {
+            var properties = new Dictionary<string, string>();
+            if (propsAsNodes != null) {
+                if (propsAsNodes.Count != expectedCount)
                     throw new Exception("Bruh you tryna break my shit?");
 
-                PropsAsNodes.ForEach(Node =>
-                {
-                    foreach (var KeyValuePair in Node.Children)
-                        if (!Properties.TryAdd(((YamlScalarNode) KeyValuePair.Key).Value,
-                            ((YamlScalarNode) KeyValuePair.Value).Value))
-                            throw new Exception($"{((YamlScalarNode) KeyValuePair.Key).Value} already defined!");
+                propsAsNodes.ForEach(node => {
+                    foreach (var keyValuePair in node.Children)
+                        if (!properties.TryAdd(((YamlScalarNode) keyValuePair.Key).Value,
+                                ((YamlScalarNode) keyValuePair.Value).Value))
+                            throw new Exception($"{((YamlScalarNode) keyValuePair.Key).Value} already defined!");
                 });
             }
 
-            return Properties;
+            return properties;
         }
 
-        public static void Subprocess(string Program, string Args)
-        {
+        public static void subprocess(string program, string args) {
             var proc = new Process();
-            proc.StartInfo = new ProcessStartInfo
-            {
-                FileName = Program,
-                Arguments = Args,
+            proc.StartInfo = new ProcessStartInfo {
+                FileName = program,
+                Arguments = args,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 CreateNoWindow = true
@@ -43,10 +36,10 @@ namespace Hotswap.Configuration
             proc?.Start();
             proc.WaitForExit();
 
-            var ErrorOutput = proc.StandardError.ReadToEnd();
+            var errorOutput = proc.StandardError.ReadToEnd();
 
             if (proc.ExitCode != 0)
-                throw new Exception(ErrorOutput);
+                throw new Exception(errorOutput);
         }
     }
 }

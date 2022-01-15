@@ -1,8 +1,6 @@
-﻿namespace Hotswap.Configuration
-{
-    public class GameDefinition
-    {
-        public string ROMCode { get; set; }
-        public string Path { get; set; }
+﻿namespace Hotswap.Configuration {
+    public class GameDefinition {
+        public string romCode { get; set; }
+        public string path { get; set; }
     }
 }

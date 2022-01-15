@@ -1,11 +1,6 @@
-﻿using System.IO;
-
-namespace BeaterLibrary.GameInfo
-{
-    public class B2W2 : AbstractGameInformation
-    {
-        public enum ImportantSystemText
-        {
+﻿namespace BeaterLibrary.GameInfo {
+    public class B2W2 : AbstractGameInformation {
+        public enum ImportantSystemText {
             ItemNames = 64,
             PokémonNames = 90,
             MapNames = 109,
@@ -25,19 +20,26 @@ namespace BeaterLibrary.GameInfo
             Heights = 452
         }
 
-        public override string[] SystemsText => new[] {"0", "0", "2"};
-        public override string[] MapText => new[] {"0", "0", "3"};
-        public override string[] ZoneHeader => new[] {"0", "1", "2"};
-        public override string[] Scripts => new[] {"0", "5", "6"};
-        public override string[] TrainerData => new[] {"0", "9", "1"};
-        public override string[] TrainerPokemon => new[] {"0", "9", "2"};
-        public override string[] ZoneEntities => new[] {"1", "2", "6"};
-        
-        public override int[] GetScriptPluginsByScrID(int ScriptIndex)
-        {
+        public override string[] systemsText => new[] {"0", "0", "2"};
+        public override string[] mapText => new[] {"0", "0", "3"};
+        public override string[] zoneHeaders => new[] {"0", "1", "2"};
+        public override string[] scripts => new[] {"0", "5", "6"};
+        public override string[] trainerData => new[] {"0", "9", "1"};
+        public override string[] trainerPokemon => new[] {"0", "9", "2"};
+        public override string[] zoneEntities => new[] {"1", "2", "6"};
+        public override string[] wildEncounters => new[] {"1", "2", "7"};
+
+        public override string[] maps => new[] {"0", "0", "8"};
+
+        public override int[] scriptPlugins => new[] {
+            50, 51, 52, 53, 54, 55, 58, 61, 62, 63, 64, 65, 66, 67, 68
+        };
+
+        public override string title => "B2W2";
+
+        public override int getScriptPluginsByScrId(int scriptIndex) {
             // TODO: Find a better way to do this.
-            switch (ScriptIndex)
-            {
+            switch (scriptIndex) {
                 case 132:
                 case 134:
                 case 136:
@@ -49,30 +51,30 @@ namespace BeaterLibrary.GameInfo
                 case 148:
                 case 150:
                 case 152:
-                    return new int[]{50};
+                    return 50;
                 case 104:
-                    return new int[]{51};
+                    return 51;
                 case 280:
                 case 282:
                 case 284:
                 case 286:
                 case 288:
-                    return new int[]{52};
+                    return 52;
                 case 762:
-                    return new int[]{53};
+                    return 53;
                 case 482:
                 case 484:
                 case 486:
                 case 488:
                 case 490:
-                    return new int[]{54};
+                    return 54;
                 case 384:
-                    return new int[]{55, 56};
+                    return 55;
                 case 386:
-                    return new int[]{55, 57};
+                    return 55;
                 case 980:
                 case 982:
-                    return new int[]{58, 59};
+                    return 58;
                 case 956:
                 case 958:
                 case 960:
@@ -85,14 +87,14 @@ namespace BeaterLibrary.GameInfo
                 case 974:
                 case 984:
                 case 986:
-                    return new int[]{61};
+                    return 61;
                 case 1132:
                 case 1134:
                 case 1136:
                 case 1148:
-                    return new int[]{62};
+                    return 62;
                 case 1146:
-                    return new int[]{63};
+                    return 63;
                 case 1106:
                 case 1116:
                 case 1122:
@@ -103,7 +105,7 @@ namespace BeaterLibrary.GameInfo
                 case 1162:
                 case 1164:
                 case 1166:
-                    return new int[]{64};
+                    return 64;
                 case 2:
                 case 16:
                 case 40:
@@ -124,25 +126,23 @@ namespace BeaterLibrary.GameInfo
                 case 920:
                 case 944:
                 case 1204:
-                    return new int[]{65};
+                    return 65;
                 case 278:
                 case 426:
                 case 854:
                 case 1208:
-                    return new int[]{66};
+                    return 66;
                 case 926:
                 case 930:
                 case 948:
-                    return new int[]{67};
+                    return 67;
                 case 106:
                 case 1130:
                 case 1228:
-                    return new int[]{68};
+                    return 68;
                 default:
-                    return new int[]{};
+                    return -1;
             }
         }
-
-        public override string Title => "B2W2";
     }
 }

@@ -4,45 +4,53 @@ using System.IO;
 using YamlDotNet.RepresentationModel;
 using YamlDotNet.Serialization;
 
-namespace Hotswap.Configuration
-{
-    public class BaseROMConfiguration
-    {
-        public BaseROMConfiguration(string Path)
-        {
-            Games = new List<string>();
-            BaseROMLookupTable = new List<GameDefinition>();
-            foreach (var BaseROMPair in new Deserializer()
-                .Deserialize<Dictionary<string, List<YamlMappingNode>>>(File.ReadAllText(Path)))
-            {
-                Games.Add(BaseROMPair.Key);
-                var ParsedConfig = Util.ParseConfigurationYAML(BaseROMPair.Value, 2);
-                if (!ParsedConfig.ContainsKey("Path") || !ParsedConfig.ContainsKey("ROMCode"))
-                    throw new Exception("Lmao got em");
-                BaseROMLookupTable.Add(new GameDefinition
-                {
-                    Path = ParsedConfig["Path"],
-                    ROMCode = ParsedConfig["ROMCode"]
+namespace Hotswap.Configuration {
+    public class baseROMConfiguration {
+        private string _path;
+
+        public baseROMConfiguration() {
+            games = new List<string>();
+            baseRomLookupTable = new List<GameDefinition>();
+        }
+
+        public List<string> games { get; }
+        private List<GameDefinition> baseRomLookupTable { get; }
+
+        public void initializePatcher(string path) {
+            if (!File.Exists(path))
+                throw new Exception(
+                    "BaseROM.yml is missing. Please ensure this is in your SwissArmyKnife folder, and try again.");
+            foreach (var baseRomPair in new Deserializer()
+                         .Deserialize<Dictionary<string, List<YamlMappingNode>>>(File.ReadAllText(path))) {
+                games.Add(baseRomPair.Key);
+                var parsedConfig = Util.parseConfigurationYaml(baseRomPair.Value, 2);
+                if (!parsedConfig.ContainsKey("Path") || !parsedConfig.ContainsKey("ROMCode"))
+                    throw new Exception(
+                        "Malformed BaseROM configuration. Please fix the BaseROM configuration and try again.");
+                baseRomLookupTable.Add(new GameDefinition {
+                    path = parsedConfig["Path"],
+                    romCode = parsedConfig["ROMCode"]
                 });
             }
         }
 
-        public List<string> Games { get; }
-        public List<GameDefinition> BaseROMLookupTable { get; }
-
-        public string GetROMPath(string ROMCode)
-        {
-            if (ROMCode.Length != 4)
-                throw new Exception("Invalid ROM Code. They must be of length 4.");
-
-            try
-            {
-                return BaseROMLookupTable.Find(Defs => Defs.ROMCode.Equals(ROMCode)).Path;
+        public string getRomPath(string romCode) {
+            try {
+                return baseRomLookupTable.Find(defs => defs.romCode.Equals(romCode)).path;
             }
-            catch (Exception)
-            {
+            catch (Exception) {
                 throw new Exception(
-                    $"Could not find the ROM Code \"{ROMCode}\" in the database. Make sure it is there, and try again.");
+                    $"Could not find the ROM Code \"{romCode}\" in the database. Please ensure this is a valid ROM code, then try again.");
+            }
+        }
+
+        public string getROMCode(string Name) {
+            try {
+                return baseRomLookupTable[games.IndexOf(Name)].romCode;
+            }
+            catch (Exception) {
+                throw new Exception(
+                    $"Could not find the name \"{Name}\" in the database.");
             }
         }
     }
