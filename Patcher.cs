@@ -13,6 +13,9 @@ namespace Hotswap {
             baseRomConfig = new baseROMConfiguration();
             baseRomConfig.initializePatcher(baseRomConfigPath);
             projectConfig = new ProjectConfiguration(projectConfigPath);
+            if (!File.Exists(baseRomConfig.getRomPath(projectConfig.project.baseRomCode))) {
+                throw new Exception($"File not found: {baseRomConfig.getRomPath(projectConfig.project.baseRomCode)}");
+            }
             baseRom = new Rom(baseRomConfig.getRomPath(projectConfig.project.baseRomCode));
         }
 
