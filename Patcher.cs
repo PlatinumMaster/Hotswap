@@ -9,6 +9,11 @@ using NitroSharp.IO;
 
 namespace Hotswap {
     public class Patcher {
+        private baseROMConfiguration baseRomConfig { get; }
+        private ProjectConfiguration projectConfig { get; }
+        private Rom baseRom { get; set; }
+        public static bool isPreloading;
+        private string romPath;
         public Patcher(string baseRomConfigPath, string projectConfigPath) {
             baseRomConfig = new baseROMConfiguration();
             baseRomConfig.initializePatcher(baseRomConfigPath);
@@ -16,13 +21,9 @@ namespace Hotswap {
             if (!File.Exists(baseRomConfig.getRomPath(projectConfig.project.baseRomCode))) {
                 throw new Exception($"File not found: {baseRomConfig.getRomPath(projectConfig.project.baseRomCode)}");
             }
-            baseRom = new Rom(baseRomConfig.getRomPath(projectConfig.project.baseRomCode));
+            romPath = baseRomConfig.getRomPath(projectConfig.project.baseRomCode);
         }
 
-        private baseROMConfiguration baseRomConfig { get; }
-        private ProjectConfiguration projectConfig { get; }
-        private Rom baseRom { get; }
-        
         private void patchRomSettings() {
             baseRom.header.title = projectConfig.project.projectGameTitle;
             baseRom.header.gameCode = projectConfig.project.projectRomCode;
@@ -91,8 +92,22 @@ namespace Hotswap {
             }
         }
 
+        public void handleROM(bool mount) {
+            if (isPreloading && baseRom != null) {
+                return;
+            }
+            if (mount) {
+                if (baseRom == null) {
+                    baseRom = new Rom(romPath);
+                }
+            } else {
+                baseRom = null;
+            }
+        }
+
         public NitroFile getFileFromOriginRom(string filePath) {
-            return NitroDirectory.searchDirectoryForFile(baseRom.root, filePath);
+            NitroFile file = NitroDirectory.searchDirectoryForFile(baseRom.root, filePath);
+            return file;
         }
 
         public void patchFile(string path, string romPath) {
@@ -119,12 +134,17 @@ namespace Hotswap {
                 AbstractGameInformation.getSystemPath(gamePath), $"{id}.bin");
             if (File.Exists(externalPath))
                 return File.ReadAllBytes(externalPath);
-            return new Narc(getFileFromOriginRom(AbstractGameInformation.getGamePath(gamePath)).fileData).fat
+            handleROM(true);
+            byte[] buf = new Narc(getFileFromOriginRom(AbstractGameInformation.getGamePath(gamePath)).fileData).fat
                 .entries[id].buffer;
+            handleROM(false);
+            return buf;
         }
 
         public NitroFile fetchFileFromRomfs(string[] gamePath) {
+            handleROM(true);
             var originFile = getFileFromOriginRom(AbstractGameInformation.getGamePath(gamePath));
+            handleROM(false);
             var externalPath = Path.Combine(projectConfig.project.romFileSystemPath,
                 AbstractGameInformation.getSystemPath(gamePath));
             if (File.Exists(externalPath))
@@ -195,19 +215,27 @@ namespace Hotswap {
         }
 
         public void patchAndSerialize(string outputPath) {
+            handleROM(true);
             patchRomSettings();
             patchRomFileSystem();
             patchExecutableFileSystem();
             baseRom.serialize(outputPath);
+            handleROM(false);
         }
 
         public int getNarcEntryCount(string[] gamePath) {
-            return new Narc(getFileFromOriginRom(AbstractGameInformation.getGamePath(gamePath)).fileData).fat.entries
+            handleROM(true);
+            int cnt = new Narc(getFileFromOriginRom(AbstractGameInformation.getGamePath(gamePath)).fileData).fat.entries
                 .Count;
+            handleROM(false);
+            return cnt;
         }
 
         public string getGameCode() {
-            return baseRom.header.gameCode;
+            handleROM(true);
+            string code = baseRom.header.gameCode;
+            handleROM(false);
+            return code;
         }
     }
 }
