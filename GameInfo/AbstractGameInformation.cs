@@ -1,7 +1,9 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 
 namespace BeaterLibrary.GameInfo {
     public abstract class AbstractGameInformation {
+        public Dictionary<string, int> ImportantSystemText;
         public abstract string[] systemsText { get; }
         public abstract string[] mapText { get; }
         public abstract string[] zoneHeaders { get; }

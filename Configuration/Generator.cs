@@ -12,7 +12,7 @@ namespace Hotswap.Configuration {
             text.WriteLine($"- BaseROMCode: {baseRom}");
             text.WriteLine("- ExecutableFileSystemPath: exefs");
             text.WriteLine("- ROMFileSystemPath: nitrofs");
-            text.WriteLine("- ProjectROMCode: TEST");
+            text.WriteLine($"- ProjectROMCode: {baseRom}");
             text.WriteLine("- ProjectGameTitle: TESTTESTTEST");
             text.WriteLine("- OverlayModulePath: overlays");
             text.WriteLine("- NARCsPath: narcs");

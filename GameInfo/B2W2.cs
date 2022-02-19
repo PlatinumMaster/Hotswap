@@ -1,24 +1,26 @@
-﻿namespace BeaterLibrary.GameInfo {
+﻿using System.Collections.Generic;
+
+namespace BeaterLibrary.GameInfo {
     public class B2W2 : AbstractGameInformation {
-        public enum ImportantSystemText {
-            ItemNames = 64,
-            PokémonNames = 90,
-            MapNames = 109,
-            BattleTypes = 357,
-            DebugSoundTestNames = 366,
-            SpecialTrainerNames = 368,
-            CreditsNames = 369,
-            StartMenuMysteryGift = 371,
-            Abilities = 374,
-            TrainerDialogue = 381,
-            TrainerNames = 382,
-            TrainerClasses = 383,
-            Types = 398,
-            MoveDescriptions = 402,
-            MoveNames = 403,
-            WorldTournamentTrainerNames = 409,
-            Heights = 452
-        }
+        public static new Dictionary<string, int> ImportantSystemText = new() {
+            {"ItemNames", 64},
+            {"PokémonNames", 90},
+            {"MapNames", 109},
+            {"BattleTypes", 357},
+            {"DebugSoundTestNames", 366},
+            {"SpecialTrainerNames", 368},
+            {"CreditsNames", 369},
+            {"StartMenuMysteryGift", 371},
+            {"Abilities", 374},
+            {"TrainerDialogue", 381},
+            {"TrainerNames", 382},
+            {"TrainerClasses", 383},
+            {"Types", 398},
+            {"MoveDescriptions", 402},
+            {"MoveNames", 403},
+            {"WorldTournamentTrainerNames", 409},
+            {"PokédexHeights", 452},
+        };
 
         public override string[] systemsText => new[] {"0", "0", "2"};
         public override string[] mapText => new[] {"0", "0", "3"};
@@ -38,6 +40,28 @@
 
         public override string title => "B2W2";
 
+        public B2W2() {
+            ImportantSystemText = new() {
+                {"ItemNames", 64},
+                {"PokémonNames", 90},
+                {"MapNames", 109},
+                {"BattleTypes", 357},
+                {"DebugSoundTestNames", 366},
+                {"SpecialTrainerNames", 368},
+                {"CreditsNames", 369},
+                {"StartMenuMysteryGift", 371},
+                {"Abilities", 374},
+                {"TrainerDialogue", 381},
+                {"TrainerNames", 382},
+                {"TrainerClasses", 383},
+                {"Types", 398},
+                {"MoveDescriptions", 402},
+                {"MoveNames", 403},
+                {"WorldTournamentTrainerNames", 409},
+                {"PokédexHeights", 452},
+            };
+        }
+        
         public override int getScriptPluginsByScrId(int scriptIndex) {
             // TODO: Find a better way to do this.
             switch (scriptIndex) {
