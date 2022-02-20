@@ -30,6 +30,11 @@ namespace Hotswap {
         }
 
         private void patchRomFileSystem() {
+            if (Directory.Exists(projectConfig.project.romFileSystemPath))
+                foreach (var file in Directory.EnumerateFiles(projectConfig.project.romFileSystemPath, "*",
+                             SearchOption.AllDirectories))
+                    patchFile(file, Path.GetRelativePath(projectConfig.project.romFileSystemPath, file));
+            
             if (Directory.Exists(projectConfig.project.narCsPath)) {
                 var narCs = new List<string>();
                 recursiveDepthSearch(projectConfig.project.narCsPath, 0, 3, ref narCs);
@@ -53,11 +58,6 @@ namespace Hotswap {
                     originalFile.fileData = narcFile.serialize();
                 }
             }
-
-            if (Directory.Exists(projectConfig.project.romFileSystemPath))
-                foreach (var file in Directory.EnumerateFiles(projectConfig.project.romFileSystemPath, "*",
-                             SearchOption.AllDirectories))
-                    patchFile(file, Path.GetRelativePath(projectConfig.project.romFileSystemPath, file));
         }
 
         private void patchExecutableFileSystem() {
