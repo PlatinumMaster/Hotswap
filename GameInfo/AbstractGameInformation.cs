@@ -23,8 +23,12 @@ namespace BeaterLibrary.GameInfo {
             return Path.Combine(data);
         }
 
-        public static string getGamePath(string[] data) {
+        public static string getGameNARCPath(string[] data) {
             return "/a/" + string.Join("/", data);
+        }
+        
+        public static string getGameFSPath(string[] data) {
+            return "/" + string.Join("/", data);
         }
     }
 }

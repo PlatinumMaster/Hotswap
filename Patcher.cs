@@ -36,7 +36,7 @@ namespace Hotswap {
                 foreach (var narc in narCs) {
                     var originalFile =
                         getFileFromOriginRom(
-                            AbstractGameInformation.getGamePath(Path
+                            AbstractGameInformation.getGameNARCPath(Path
                                 .GetRelativePath(projectConfig.project.narCsPath, narc)
                                 .Split(Path.DirectorySeparatorChar)));
                     var narcFile = new Narc(originalFile.fileData);
@@ -106,14 +106,14 @@ namespace Hotswap {
         }
 
         public NitroFile getFileFromOriginRom(string filePath) {
-            NitroFile file = NitroDirectory.searchDirectoryForFile(baseRom.root, filePath);
-            return file;
+            return NitroDirectory.searchDirectoryForFile(baseRom.root, filePath);
         }
 
         public void patchFile(string path, string romPath) {
-            var foo = getFileFromOriginRom($"/{romPath}");
-            if (foo != null)
+            var foo = getFileFromOriginRom(AbstractGameInformation.getGameFSPath(romPath.Split(Path.DirectorySeparatorChar)));
+            if (foo != null) {
                 foo.fileData = File.ReadAllBytes(path);
+            }
         }
 
         private void recursiveDepthSearch(string parent, int actualDepth, int targetDepth, ref List<string> paths) {
@@ -135,7 +135,7 @@ namespace Hotswap {
             if (File.Exists(externalPath))
                 return File.ReadAllBytes(externalPath);
             handleROM(true);
-            byte[] buf = new Narc(getFileFromOriginRom(AbstractGameInformation.getGamePath(gamePath)).fileData).fat
+            byte[] buf = new Narc(getFileFromOriginRom(AbstractGameInformation.getGameNARCPath(gamePath)).fileData).fat
                 .entries[id].buffer;
             handleROM(false);
             return buf;
@@ -143,7 +143,7 @@ namespace Hotswap {
 
         public NitroFile fetchFileFromRomfs(string[] gamePath) {
             handleROM(true);
-            var originFile = getFileFromOriginRom(AbstractGameInformation.getGamePath(gamePath));
+            var originFile = getFileFromOriginRom(AbstractGameInformation.getGameNARCPath(gamePath));
             handleROM(false);
             var externalPath = Path.Combine(projectConfig.project.romFileSystemPath,
                 AbstractGameInformation.getSystemPath(gamePath));
@@ -225,7 +225,7 @@ namespace Hotswap {
 
         public int getNarcEntryCount(string[] gamePath) {
             handleROM(true);
-            int cnt = new Narc(getFileFromOriginRom(AbstractGameInformation.getGamePath(gamePath)).fileData).fat.entries
+            int cnt = new Narc(getFileFromOriginRom(AbstractGameInformation.getGameNARCPath(gamePath)).fileData).fat.entries
                 .Count;
             handleROM(false);
             return cnt;
