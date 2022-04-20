@@ -14,9 +14,7 @@ namespace BeaterLibrary.GameInfo {
         public override string[] wildEncounters => new[] {"1", "2", "6"};
         public override int[] scriptPlugins { get; }
         public override string title => "BW";
-        public override int getScriptPluginsByScrId(int scriptIndex) {
-            throw new System.NotImplementedException();
-        }
+        public override int getScriptPluginsByScrId(int scriptIndex) => -1;
 
         public BW() {
             ImportantSystemText = new() {
